@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -22,6 +23,7 @@ import { TasksService } from './tasks.service';
 @UseGuards(AuthGuard())
 export class TasksController {
   constructor(private taskService: TasksService) {}
+  private logger = new Logger('TasksController', { timestamp: true });
 
   @Get()
   getTasks(
@@ -33,6 +35,7 @@ export class TasksController {
 
   @Get('/:id')
   getTaskById(@Param('id') id: string, @GetUser() user: User): Promise<Task> {
+    this.logger.verbose(`Get task attempt:: ${user.username}`);
     return this.taskService.getTaskById(id, user);
   }
 
@@ -46,11 +49,13 @@ export class TasksController {
     @Body() createTaskDTO: CreateTaskDTO,
     @GetUser() user: User,
   ): Promise<Task> {
+    this.logger.verbose(`Create task attempt:: ${user.username}`);
     return this.taskService.createTask(createTaskDTO, user);
   }
 
   @Delete('/:id')
   deleteTask(@Param('id') id: string, @GetUser() user: User): Promise<void> {
+    this.logger.verbose(`Delete task attempt:: ${user.username}`);
     return this.taskService.deleteTaskById(id, user);
   }
 
@@ -61,6 +66,7 @@ export class TasksController {
     @GetUser() user: User,
   ): Promise<Task> {
     const { status } = updateTaskStatusDTO;
+    this.logger.verbose(`Update task attempt:: ${user.username}`);
     return this.taskService.updateTaskStatus(id, status, user);
   }
 }
